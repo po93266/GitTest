@@ -25,12 +25,47 @@ namespace WisdomTree.WangGuanNan.Function
         static string GIT_BASE = Application.dataPath.Replace("/", "\\").Remove(Application.dataPath.Replace("/", "\\").Length - 6, 6);
 
         /// <summary>
+        /// SVN更新
+        /// </summary>
+        [MenuItem("GIT/Update %g", false, 1)]
+        public static void GitUpdate()
+        {
+            ProcessCommand("TortoiseGitProc.exe", "/command:update /path:\"" + GIT_BASE + "Assets" + "\"");
+        }
+
+        /// <summary>
         /// GIT提交
         /// </summary>
         [MenuItem("GIT/Commit", false, 2)]
-        public static void SvnCommit()
+        public static void GitCommit()
         {
             ProcessCommand("TortoiseGitProc.exe", "/command:commit /path:\"" + GIT_BASE + "Assets" + "\"");
+        }
+
+        /// <summary>
+        /// SVN选择并提交
+        /// </summary>
+        [MenuItem("GIT/CommitSelect", false, 3)]
+        public static void GitCommitSelect()
+        {
+            if (Selection.GetFiltered(typeof(object), SelectionMode.Assets).Length > 0)
+            {
+                string selectionPath = string.Empty;
+                for (int i = 0; i < Selection.GetFiltered(typeof(object), SelectionMode.Assets).Length; i++)
+                {
+                    if (i > 0)
+                    {
+                        selectionPath = selectionPath + "*" + GIT_BASE + AssetDatabase.GetAssetPath(Selection.GetFiltered(typeof(object), SelectionMode.Assets)[i]).Replace("/", "\\");
+                        selectionPath = selectionPath + "*" + GIT_BASE + MetaFile(AssetDatabase.GetAssetPath(Selection.GetFiltered(typeof(object), SelectionMode.Assets)[i])).Replace("/", "\\");
+                    }
+                    else
+                    {
+                        selectionPath = GIT_BASE + AssetDatabase.GetAssetPath(Selection.GetFiltered(typeof(object), SelectionMode.Assets)[i]).Replace("/", "\\");
+                        selectionPath = selectionPath + "*" + GIT_BASE + MetaFile(AssetDatabase.GetAssetPath(Selection.GetFiltered(typeof(object), SelectionMode.Assets)[i])).Replace("/", "\\");
+                    }
+                }
+                ProcessCommand("TortoiseGitProc.exe", "/command:commit /path:\"" + selectionPath + "\"");
+            }
         }
 
         /// <summary>
